@@ -106,7 +106,7 @@
         // Function để lấy dữ liệu mới nhất từ server và hiển thị
         async function fetchData() {
             try {
-                const response = await fetch('http://localhost:3000/data');
+                const response = await fetch('https://import-export-excel-adn1.onrender.com/data');
                 const data = await response.json();
                 displayGroupData(data.groups);
                 displayProductData(data.products);
@@ -167,7 +167,7 @@
             event.preventDefault(); // Prevent default form submission
             const formData = new FormData(importForm);
             try {
-                const response = await fetch('http://localhost:3000/import', {
+                const response = await fetch('https://import-export-excel-adn1.onrender.com/import', {
                     method: 'POST',
                     body: formData
                 });
@@ -188,7 +188,7 @@
         const exportButton = document.getElementById('exportButton');
         exportButton.addEventListener('click', async () => {
             try {
-                const response = await fetch('http://localhost:3000/export');
+                const response = await fetch('https://import-export-excel-adn1.onrender.com/export');
                 const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');

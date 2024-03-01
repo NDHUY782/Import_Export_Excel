@@ -5,7 +5,7 @@
     "title": "Backend Developer Test API",
     "description": "API for managing data for backend developer test"
   },
-  "host": "localhost:3000",
+  "host": "import-export-excel-adn1.onrender.com",
   "basePath": "/",
   "schemes": [
     "http"

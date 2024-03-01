@@ -1,0 +1,122 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Backend Developer Test API",
+    "description": "API for managing data for backend developer test"
+  },
+  "host": "localhost:3000",
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/import": {
+      "post": {
+        "summary": "Import data from Excel file",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "file",
+            "in": "formData",
+            "description": "The Excel file to import",
+            "required": true,
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Import successful"
+          },
+          "400": {
+            "description": "Invalid file format"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/export": {
+      "get": {
+        "summary": "Export data to Excel file",
+        "produces": [
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        ],
+        "responses": {
+          "200": {
+            "description": "File download"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/data": {
+      "get": {
+        "summary": "Get all data",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "groups": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Group"
+                  }
+                },
+                "products": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Product"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Group": {
+      "type": "object",
+      "properties": {
+        "groupID": {
+          "type": "string"
+        },
+        "groupName": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        }
+      }
+    },
+    "Product": {
+      "type": "object",
+      "properties": {
+        "groupID": {
+          "type": "string"
+        },
+        "productName": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

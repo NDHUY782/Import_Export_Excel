@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 20px;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f2f2f2;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Data Management</h1>
+
+    <!-- Form để import file Excel -->
+    <form id="importForm" enctype="multipart/form-data">
+        <input type="file" name="file" required>
+        <button type="submit">Import</button>
+    </form>
+
+    <!-- Thông báo import -->
+    <div id="importResult"></div>
+
+    <!-- Bảng hiển thị dữ liệu Group -->
+    <h2>Danh sách dữ liệu Group</h2>
+    <table id="groupTable">
+        <thead>
+            <tr>
+                <th>Group ID</th>
+                <th>Group Name</th>
+                <th>Title</th>
+                <th>Content</th>
+            </tr>
+        </thead>
+        <tbody id="groupBody">
+            <!-- Dữ liệu sẽ được thêm vào đây sau khi import -->
+        </tbody>
+    </table>
+
+    <!-- Bảng hiển thị dữ liệu Product -->
+    <h2>Danh sách dữ liệu Product</h2>
+    <table id="productTable">
+        <thead>
+            <tr>
+                <th>Group ID</th>
+                <th>Product Name</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody id="productBody">
+            <!-- Dữ liệu sẽ được thêm vào đây sau khi import -->
+        </tbody>
+    </table>
+
+    <!-- Button để export dữ liệu ra file Excel -->
+    <button id="exportButton">Export to Excel</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchData();
+        });
+
+        // Function để lấy dữ liệu mới nhất từ server và hiển thị
+        async function fetchData() {
+            try {
+                const response = await fetch('http://localhost:3000/data');
+                const data = await response.json();
+                displayGroupData(data.groups);
+                displayProductData(data.products);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Function hiển thị dữ liệu Group
+        function displayGroupData(groups) {
+            const groupTable = document.getElementById('groupTable');
+            groupTable.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Group ID</th>
+                        <th>Group Name</th>
+                        <th>Title</th>
+                        <th>Content</th>
+                    </tr>
+                </thead>
+                <tbody id="groupBody">
+                    ${groups.map(group => `
+                        <tr>
+                            <td>${group.groupID}</td>
+                            <td>${group.groupName}</td>
+                            <td>${group.title}</td>
+                            <td>${group.content}</td>
+                        </tr>`).join('')}
+                </tbody>
+            `;
+        }
+
+        // Function hiển thị dữ liệu Product
+        function displayProductData(products) {
+            const productTable = document.getElementById('productTable');
+            productTable.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Group ID</th>
+                        <th>Product Name</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody id="productBody">
+                    ${products.map(product => `
+                        <tr>
+                            <td>${product.groupID}</td>
+                            <td>${product.productName}</td>
+                            <td>${product.description}</td>
+                        </tr>`).join('')}
+                </tbody>
+            `;
+        }
+
+        // Xử lý nút import
+        const importForm = document.getElementById('importForm');
+        importForm.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent default form submission
+            const formData = new FormData(importForm);
+            try {
+                const response = await fetch('http://localhost:3000/import', {
+                    method: 'POST',
+                    body: formData
+                });
+                if (response.ok) {
+                    alert('Import successful!');
+                    await fetchData(); // Fetch new data after successful import
+                } else {
+                    const error = await response.text();
+                    alert(`Import failed: ${error}`);
+                }
+            } catch (error) {
+                console.error('Error importing data:', error);
+                alert('Error importing data. Please try again.');
+            }
+        });
+
+        // Xử lý khi nút export
+        const exportButton = document.getElementById('exportButton');
+        exportButton.addEventListener('click', async () => {
+            try {
+                const response = await fetch('http://localhost:3000/export');
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'data.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Error exporting data:', error);
+                alert('Error exporting data. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>
